@@ -2,6 +2,7 @@ use core::fmt;
 use std::ops::{Add, Neg, Sub, AddAssign, SubAssign, Div, DivAssign, Mul, MulAssign};
 use num_traits::{Float, NumAssignOps, NumCast};
 
+const EPSILON: f64 = 1e-6;
 
 #[derive(Debug, Copy, Clone, Eq)]
 pub struct Complex<T> 
@@ -23,7 +24,8 @@ where T: Float + NumAssignOps {
 impl<T> PartialEq for Complex<T>
 where T: Float + NumAssignOps {
     fn eq(&self, other: &Self) -> bool {
-        self.re == other.re && self.im == other.im
+        let epsilon = T::from(EPSILON).unwrap();
+        return (self.re - other.re).abs() <= epsilon && (self.im - other.im).abs() <= epsilon
     }
 
     fn ne(&self, other: &Self) -> bool {
@@ -381,6 +383,7 @@ mod tests {
         let a_5 = Complex::new(-972.0, -972.0);
         assert_eq!(a.pow(0), a_0);
         assert_eq!(a.pow(1), a_1);
+        assert_eq!(a.pow(5), a_5);
         assert!(a.pow(5).approximately_equal(&a_5, Some(0.001)));
     }
 }
